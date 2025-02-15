@@ -1,4 +1,4 @@
-import { h, createContext } from 'preact';
+import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 import { useMacros } from '../hooks/useMacros';
 

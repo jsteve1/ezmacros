@@ -1,6 +1,6 @@
 import { Dialog } from '@headlessui/react';
 import { useState } from 'preact/hooks';
-import { format, startOfDay, endOfDay, subDays } from 'date-fns';
+import { format, startOfDay, endOfDay } from 'date-fns';
 
 interface DateRangeModalProps {
   isOpen: boolean;

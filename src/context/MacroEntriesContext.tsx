@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { createContext } from 'preact';
 import { useContext, useState, useEffect, useCallback } from 'preact/hooks';
 import { supabase } from '../lib/supabase';

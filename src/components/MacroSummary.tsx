@@ -1,7 +1,7 @@
 import { useMacroTotals } from '../context/MacroTotalsContext';
 
 export default function MacroSummary() {
-  const { totals, isLoading, error } = useMacroTotals();
+  const { totals, error } = useMacroTotals();
   console.log('MacroSummary totals:', totals);
 
   if (error) {
