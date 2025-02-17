@@ -3,12 +3,12 @@ import preact from '@preact/preset-vite'
 import mkcert from 'vite-plugin-mkcert'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     preact(),
     mkcert()
   ],
-  base: process.env.DEPLOY === 'gh-pages' ? '/ezmacros/' : '/',
+  base: command === 'build' ? '/ezmacros/' : '/',
   build: {
     outDir: 'dist',
     sourcemap: true
@@ -27,4 +27,4 @@ export default defineConfig({
     jsxFactory: 'h',
     jsxFragment: 'Fragment'
   }
-});
+}));
