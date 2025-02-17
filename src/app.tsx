@@ -41,14 +41,17 @@ export function App() {
 
   // Hash-based routing
   const hash = window.location.hash.slice(1) || '/';
+
+  // Handle auth routes first
+  if (hash === '/signup') {
+    return <Signup />;
+  }
   
-  if (!user) {
-    if (hash === '/signup') {
-      return <Signup />;
-    }
+  if (hash === '/login' || !user) {
     return <Login />;
   }
 
+  // If user is authenticated and not on auth routes, show main app
   return (
     <DateRangeProvider>
       <MacroTotalsProvider>
