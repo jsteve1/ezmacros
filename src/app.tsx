@@ -31,12 +31,6 @@ export function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle routing
-  const path = window.location.pathname;
-  const isGitHubPages = path.startsWith('/ezmacros');
-  const basePath = isGitHubPages ? '/ezmacros' : '';
-  const relativePath = isGitHubPages ? path.replace('/ezmacros', '') : path;
-
   if (isLoading) {
     return (
       <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg">
@@ -45,8 +39,11 @@ export function App() {
     );
   }
 
+  // Hash-based routing
+  const hash = window.location.hash.slice(1) || '/';
+  
   if (!user) {
-    if (relativePath === '/signup') {
+    if (hash === '/signup') {
       return <Signup />;
     }
     return <Login />;
