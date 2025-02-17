@@ -1,128 +1,131 @@
-# EZ Macros Bruh
+# 🍔 EZ Macros
 
-A modern, lightweight macro tracking app built with Preact and Supabase. Track your daily macronutrients with ease, scan barcodes for quick entry, and view your progress over time.
+<div align="center">
+
+[![Deploy to GitHub Pages](https://github.com/jsteve1/ezmacros/actions/workflows/deploy.yml/badge.svg)](https://github.com/jsteve1/ezmacros/actions/workflows/deploy.yml)
+
+A sleek, modern macro tracking app that makes nutrition tracking actually enjoyable.  
+Built with Preact + Supabase. Deployed with ❤️ on GitHub Pages.
+
+[Live Demo](https://jsteve1.github.io/ezmacros/) • [Report Bug](https://github.com/jsteve1/ezmacros/issues) • [Request Feature](https://github.com/jsteve1/ezmacros/issues)
 
 ![Dark Mode Screenshot](screenshots/dark.png)
 ![Light Mode Screenshot](screenshots/light.png)
 
-## Features
+</div>
 
-- 🌙 Beautiful dark/light theme with system sync
-- 📱 Responsive design for all devices
-- 📊 Daily macro tracking (carbs, fat, protein)
-- 📷 Barcode scanning with Open Food Facts integration
-- 📅 Flexible date range selection
-- 📝 View and manage your entries
-- 🔒 Secure authentication with Supabase
-- ⚡ Lightning fast and lightweight
+## ✨ Features
 
-## Tech Stack
+- 🎯 **Simple & Intuitive** - Track your macros with minimal friction
+- 📱 **Responsive Design** - Works beautifully on all devices
+- 🔄 **Real-time Updates** - See your nutrition data update instantly
+- 📊 **Smart Analytics** - Track your macros and calories over time
+- 🌙 **Dark Mode** - Easy on the eyes, with system theme detection
+- 📷 **Barcode Scanner** - Scan products for instant macro data
+- 🔐 **Secure Auth** - Powered by Supabase authentication
+- ⚡ **Lightning Fast** - Built with performance in mind
 
-- [Preact](https://preactjs.com/) - Fast 3kB alternative to React
-- [Vite](https://vitejs.dev/) - Next Generation Frontend Tooling
-- [Supabase](https://supabase.com/) - Open source Firebase alternative
-- [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS framework
-- [Headless UI](https://headlessui.dev/) - Unstyled UI components
-- [date-fns](https://date-fns.org/) - Modern JavaScript date utility library
-- [ZXing](https://github.com/zxing-js/library) - Barcode scanning library
-- [TypeScript](https://www.typescriptlang.org/) - JavaScript with syntax for types
+## 🚀 Quick Start
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- A Supabase account (free tier works great)
-
-### Installation
-
-1. Clone the repository:
+1. **Clone & Install**
    ```bash
-   git clone https://github.com/yourusername/ezmacrosbruh.git
-   cd ezmacrosbruh
-   ```
-
-2. Install dependencies:
-   ```bash
+   git clone https://github.com/yourusername/ezmacros.git
+   cd ezmacros
    npm install
    ```
 
-3. Create a `.env` file in the root directory:
-   ```env
-   VITE_SUPABASE_URL=your_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+2. **Set Up Environment**
+   ```bash
+   # Create .env file
+   cp .env.example .env
+   # Add your Supabase credentials
    ```
 
-4. Set up your Supabase database with the following SQL:
-   ```sql
-   create table macro_entries (
-     id uuid default uuid_generate_v4() primary key,
-     user_id uuid references auth.users not null,
-     date date default current_date,
-     carbs integer not null,
-     fat integer not null,
-     protein integer not null,
-     created_at timestamp with time zone default timezone('utc'::text, now())
-   );
-
-   alter table macro_entries enable row level security;
-
-   create policy "Users can only see their own entries" on macro_entries
-     for all using (auth.uid() = user_id);
-   ```
-
-5. Start the development server:
+3. **Run Locally**
    ```bash
    npm run dev
    ```
+   Visit `http://localhost:5173` 🎉
 
-### Building for Production
+## 🛠️ Tech Stack
 
-```bash
-npm run build
+- **Frontend**
+  - [Preact](https://preactjs.com/) - 3kB React alternative
+  - [Vite](https://vitejs.dev/) - Next-gen frontend tooling
+  - [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS
+  - [TypeScript](https://www.typescriptlang.org/) - Type safety
+
+- **Backend**
+  - [Supabase](https://supabase.com/) - Open source Firebase alternative
+  - PostgreSQL - Rock-solid database
+
+- **Integrations**
+  - [Open Food Facts](https://world.openfoodfacts.org/) - Product database
+  - [ZXing](https://github.com/zxing-js/library) - Barcode scanning
+
+## 📦 Database Schema
+
+```sql
+create table macro_entries (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users not null,
+  date date default current_date,
+  carbs integer not null,
+  fat integer not null,
+  protein integer not null,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- Enable RLS
+alter table macro_entries enable row level security;
+
+-- Set up access policy
+create policy "Users can only see their own entries" 
+  on macro_entries for all 
+  using (auth.uid() = user_id);
 ```
 
-The built files will be in the `dist` directory.
+## 🎨 Key Features in Detail
 
-## Features in Detail
+### 📊 Macro Tracking
+- Simple, intuitive entry of carbs, fat, and protein
+- Automatic calorie calculation
+- Daily and custom date range totals
+- Visual macro distribution
 
-### Authentication
-- Email/password authentication
-- Protected routes
-- Persistent sessions
-
-### Macro Tracking
-- Add entries manually or via barcode
-- View daily totals
-- Delete entries
-- Filter by date range
-
-### Barcode Scanning
-- Uses device camera
-- Integrates with Open Food Facts database
+### 📷 Barcode Scanner
+- Instant product lookup
 - Automatic macro data population
 - Fallback to manual entry
+- Camera permission handling
 
-### Theme Support
+### 🎭 Theme System
 - Automatic system theme detection
 - Manual theme toggle
-- Persistent theme preference
+- Persistent preferences
+- Smooth transitions
 
-## Contributing
+## 🤝 Contributing
 
-1. Fork the repository
+1. Fork it
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-- [Open Food Facts](https://world.openfoodfacts.org/) for their amazing API
+- [Open Food Facts](https://world.openfoodfacts.org/) for their comprehensive API
 - [Heroicons](https://heroicons.com/) for the beautiful icons
-- The Preact team for the amazing framework
-- The Supabase team for the awesome backend platform 
+- [Preact](https://preactjs.com/) for the amazing framework
+- [Supabase](https://supabase.com/) for the powerful backend platform
+
+---
+
+<div align="center">
+Made with ❤️ by <a href="https://github.com/jsteve1">jsteve1</a>
+</div> 

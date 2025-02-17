@@ -47,7 +47,10 @@ export default function TopNav() {
 
   return (
     <nav class="fixed top-0 left-0 right-0 h-16 px-4 flex items-center justify-between bg-white dark:bg-dark-bg border-b border-gray-200 dark:border-dark-accent">
-      <div class="text-xl font-bold text-gray-900 dark:text-white">Macros Bruh</div>
+      <div class="flex items-center gap-3">
+        <span class="text-2xl" role="img" aria-label="hamburger">🍔</span>
+        <div class="text-xl font-bold text-gray-900 dark:text-white">EZ Macros</div>
+      </div>
       
       <div class="flex items-center gap-4">
         <button
