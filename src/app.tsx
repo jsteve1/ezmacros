@@ -24,6 +24,7 @@ export function App() {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Handle auth state changes
   useEffect(() => {
     // Initialize theme
     initTheme();
@@ -35,12 +36,32 @@ export function App() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        // Force navigation to login page on sign out
+        window.location.hash = '/login';
+      } else if (event === 'SIGNED_IN') {
+        // Clear hash when signing in
+        window.location.hash = '/';
+      }
       setUser(session?.user ?? null);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Handle initial route on load
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user && currentHash !== '/signup') {
+        // If not authenticated and not trying to sign up, go to login
+        window.location.hash = '/login';
+      } else if (user && (currentHash === '/login' || currentHash === '/signup')) {
+        // If authenticated but on auth pages, go to home
+        window.location.hash = '/';
+      }
+    }
+  }, [user, isLoading]);
 
   if (isLoading) {
     return (
@@ -50,16 +71,15 @@ export function App() {
     );
   }
 
-  // Route based on current hash
-  if (currentHash === '/signup') {
-    return <Signup />;
-  }
-
-  if (!user || currentHash === '/login') {
+  // Route based on current hash and auth state
+  if (!user) {
+    if (currentHash === '/signup') {
+      return <Signup />;
+    }
     return <Login />;
   }
 
-  // If user is authenticated and not on auth routes, show main app
+  // If user is authenticated, show main app
   return (
     <DateRangeProvider>
       <MacroTotalsProvider>
