@@ -33,6 +33,9 @@ export function App() {
 
   // Handle routing
   const path = window.location.pathname;
+  const isGitHubPages = path.startsWith('/ezmacros');
+  const basePath = isGitHubPages ? '/ezmacros' : '';
+  const relativePath = isGitHubPages ? path.replace('/ezmacros', '') : path;
 
   if (isLoading) {
     return (
@@ -43,7 +46,7 @@ export function App() {
   }
 
   if (!user) {
-    if (path === '/signup') {
+    if (relativePath === '/signup') {
       return <Signup />;
     }
     return <Login />;
