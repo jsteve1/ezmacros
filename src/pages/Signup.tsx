@@ -20,32 +20,44 @@ export default function Signup() {
     }
 
     try {
-      const { error } = await supabase.auth.signUp({
+      // Sign up without email confirmation
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
           data: {
-            email_confirm: true
+            email_confirmed: true
           }
         }
       });
 
-      if (error) throw error;
+      if (signUpError) {
+        // Handle rate limit error specifically
+        if (signUpError.message.includes('rate limit')) {
+          throw new Error('Please wait a moment before trying again');
+        }
+        throw signUpError;
+      }
 
-      // Automatically sign in after signup
+      // Add a small delay before signing in
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Immediately sign in after signup
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      if (signInError) throw signInError;
+      if (signInError) {
+        if (signInError.message.includes('rate limit')) {
+          throw new Error('Please wait a moment before trying again');
+        }
+        throw signInError;
+      }
 
-      // Redirect to home page
-      window.location.hash = '/';
+      // Redirect is handled by App.tsx auth state change listener
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setIsLoading(false);
     }
   };
