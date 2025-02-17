@@ -12,6 +12,17 @@ import type { User } from '@supabase/supabase-js';
 export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentHash, setCurrentHash] = useState(window.location.hash.slice(1) || '/');
+
+  // Handle hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash.slice(1) || '/');
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   useEffect(() => {
     // Initialize theme
@@ -39,15 +50,12 @@ export function App() {
     );
   }
 
-  // Hash-based routing
-  const hash = window.location.hash.slice(1) || '/';
-
-  // Handle auth routes first
-  if (hash === '/signup') {
+  // Route based on current hash
+  if (currentHash === '/signup') {
     return <Signup />;
   }
-  
-  if (hash === '/login' || !user) {
+
+  if (!user || currentHash === '/login') {
     return <Login />;
   }
 
