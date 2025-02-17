@@ -1,99 +1,119 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { BrowserMultiFormatReader, Result } from '@zxing/library';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
+import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 
 interface BarcodeScannerProps {
   onScan: (result: string) => void;
   onError?: (error: Error) => void;
 }
 
+const SCAN_DELAY = 2000; // Delay between scans in milliseconds
+
 export default function BarcodeScanner({ onScan, onError }: BarcodeScannerProps) {
+  const [isScanning, setIsScanning] = useState(true);
+  const timeoutRef = useRef<number>();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const controlsRef = useRef<IScannerControls | null>(null);
 
   useEffect(() => {
-    const codeReader = new BrowserMultiFormatReader();
-    let mounted = true;
+    // Configure reader with specific formats and hints
+    const hints = new Map<DecodeHintType, any>();
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+      BarcodeFormat.EAN_13,
+      BarcodeFormat.EAN_8,
+      BarcodeFormat.UPC_A,
+      BarcodeFormat.UPC_E
+    ]);
+    hints.set(DecodeHintType.TRY_HARDER, true);
 
-    const startScanning = async () => {
+    const reader = new BrowserMultiFormatReader(hints);
+
+    async function startScanning() {
+      if (!videoRef.current) return;
+
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: 'environment' } 
-        });
-        
-        if (!mounted) {
-          stream.getTracks().forEach(track => track.stop());
-          return;
-        }
+        controlsRef.current = await reader.decodeFromConstraints(
+          { 
+            video: { 
+              facingMode: "environment",
+              width: { min: 640, ideal: 800, max: 1280 },
+              height: { min: 480, ideal: 600, max: 720 },
+              aspectRatio: 4/3,
+              // Reduce frame rate to give more processing time per frame
+              frameRate: { ideal: 15 }
+            }
+          },
+          videoRef.current,
+          (result) => {
+            if (result && isScanning) {
+              const text = result.getText();
+              // Validate barcode format (should be numeric and reasonable length)
+              if (/^\d{8,14}$/.test(text)) {
+                setIsScanning(false);
+                onScan(text);
 
-        setHasPermission(true);
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          
-          codeReader.decodeFromVideoDevice(
-            null,
-            videoRef.current,
-            (result: Result | null) => {
-              if (result) {
-                onScan(result.getText());
+                timeoutRef.current = window.setTimeout(() => {
+                  setIsScanning(true);
+                }, SCAN_DELAY);
               }
             }
-          );
+          }
+        );
+
+        // Ensure video is playing and visible
+        if (videoRef.current) {
+          videoRef.current.play();
         }
       } catch (err) {
         if (err instanceof Error) {
-          setHasPermission(false);
           onError?.(err);
         }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
       }
-    };
+    }
 
-    startScanning();
+    if (isScanning) {
+      startScanning();
+    }
 
     return () => {
-      mounted = false;
-      codeReader.reset();
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (controlsRef.current) {
+        controlsRef.current.stop();
+      }
     };
-  }, [onScan, onError]);
-
-  if (isLoading) {
-    return (
-      <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-dark-accent rounded-lg">
-        <div class="text-gray-500 dark:text-gray-400">
-          Loading camera...
-        </div>
-      </div>
-    );
-  }
-
-  if (hasPermission === false) {
-    return (
-      <div class="flex items-center justify-center h-64 bg-gray-100 dark:bg-dark-accent rounded-lg">
-        <div class="text-center text-gray-500 dark:text-gray-400">
-          <p class="mb-2">Camera access denied</p>
-          <p class="text-sm">Please enable camera access to scan barcodes</p>
-        </div>
-      </div>
-    );
-  }
+  }, [isScanning, onScan, onError]);
 
   return (
-    <div class="relative">
-      <video
-        ref={videoRef}
-        class="w-full h-64 object-cover rounded-lg bg-black"
-        autoPlay
-        playsInline
-        muted
-      />
-      <div class="absolute inset-0 border-2 border-blue-500 rounded-lg pointer-events-none">
-        <div class="absolute inset-0 flex items-center justify-center">
-          <div class="w-48 h-48 border-2 border-blue-500 rounded-lg" />
+    <div className="relative">
+      <div className="w-full h-64 rounded-lg overflow-hidden bg-black">
+        {isScanning ? (
+          <div className="w-full h-full">
+            <video
+              ref={videoRef}
+              className="w-full h-full object-contain"
+              playsInline
+              muted
+              autoPlay
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-white text-sm">
+                Center barcode in box
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-white">
+              Scan successful! Ready for next scan in {SCAN_DELAY/1000} seconds...
+            </p>
+          </div>
+        )}
+      </div>
+      <div className="absolute inset-0 border-2 border-blue-500 rounded-lg pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-48 h-48 border-2 border-blue-500 rounded-lg" />
         </div>
       </div>
     </div>
