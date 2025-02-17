@@ -67,7 +67,7 @@ export default function TopNav() {
           </button>
         ) : (
           <button
-            onClick={() => window.location.href = '/login'}
+            onClick={() => window.location.href = '/ezmacros/login'}
             class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
           >
             Sign In

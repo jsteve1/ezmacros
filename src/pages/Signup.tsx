@@ -42,7 +42,7 @@ export default function Signup() {
       if (signInError) throw signInError;
 
       // Redirect to home page
-      window.location.href = '/';
+      window.location.href = '/ezmacros/';
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -117,7 +117,7 @@ export default function Signup() {
           </div>
 
           <div class="text-sm text-center">
-            <a href="/login" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
+            <a href="/ezmacros/login" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
               Already have an account? Sign in
             </a>
           </div>
